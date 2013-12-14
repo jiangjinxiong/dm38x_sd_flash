@@ -63,8 +63,8 @@ test -z $device && usage $0
 #fi
  
 if [ ! -b $device ]; then
-   echo "ERROR: $device is not a block device file"
-   exit 1;
+  echo "ERROR: $device is not a block device file"
+  exit 1;
 fi
 
 echo "************************************************************"
@@ -100,11 +100,17 @@ SIZE=`fdisk -l $DRIVE | grep Disk | awk '{print $5}'`
 echo DISK SIZE - $SIZE bytes
  
 CYLINDERS=`echo $SIZE/255/63/512 | bc`
- 
+
+pc1_start=0
+pc1_end=$((($CYLINDERS - $pc1_start) / 100 *99 ))
+
+# start of rootfs partition
+pc2_start=$(($pc1_start + $pc1_end))
+
 echo CYLINDERS - $CYLINDERS
 {
-  echo ,9,0x0C,*
-  echo 10,,,-
+  echo $pc1_start,$pc1_end,0x0C,*
+  echo $pc2_start,$pc2_end,,-
 } | sfdisk -D -H 255 -S 63 -C $CYLINDERS $DRIVE
 
 echo "[Making filesystems...]"
@@ -116,10 +122,16 @@ mkfs.vfat -F 32 -n rootfs ${DRIVE}2 &> /dev/null
 echo "[Copying files...]"
 
 mount ${DRIVE}1 /mnt
-cp $DM38x_UBOOT1 /mnt/MLO
-cp $DM38x_UBOOT2 /mnt/u-boot.bin
-cp $DM38x_KERNEL /mnt/uImage
-#cp $DM38x_ROOTFS /mnt/rootfs
+if [ $? -eq 0 ]; then
+  mkdir /mnt/nand
+  cp $DM38x_UBOOT1 /mnt/nand/u-boot.min.nand
+  cp $DM38x_UBOOT2 /mnt/nand/u-boot.bin
+  cp $DM38x_KERNEL /mnt/nand/uImage
+  cp $DM38x_ROOTFS /mnt/nand/rootfs
+
+  cp $DM38x_UBOOT1_sd /mnt/MLO
+  cp $DM38x_UBOOT2_sd /mnt/u-boot.bin
+fi
 umount ${DRIVE}1
 
 #mount ${DRIVE}2 /mnt
