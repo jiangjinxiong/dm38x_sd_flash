@@ -1,5 +1,3 @@
-#!/bin/bash
-
 #! /bin/sh
 # Script to create SD card for DM38x plaform.
 #
@@ -120,6 +118,10 @@ echo "[Making filesystems...]"
 mkfs.vfat -F 32 -n boot ${DRIVE}1 &> /dev/null
 #mkfs.ext3 -L rootfs ${device}2 &> /dev/null
 mkfs.vfat -F 32 -n rootfs ${DRIVE}2 &> /dev/null
+
+#echo "[Creating boot.scr...]"
+#cat <<EOF >./original/sd/boot.scr
+#EOF
 
 echo "[Copying files...]"
 
