@@ -109,8 +109,10 @@ pc2_start=$(($pc1_start + $pc1_end))
 
 echo CYLINDERS - $CYLINDERS
 {
-  echo $pc1_start,$pc1_end,0x0C,*
-  echo $pc2_start,$pc2_end,,-
+#  echo $pc1_start,$pc1_end,0x0C,*
+#  echo $pc2_start,$pc2_end,,-
+echo ,9,0x0C,*
+echo 10,,,-
 } | sfdisk -D -H 255 -S 63 -C $CYLINDERS $DRIVE
 
 echo "[Making filesystems...]"
