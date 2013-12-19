@@ -123,6 +123,12 @@ mkfs.vfat -F 32 -n rootfs ${DRIVE}2 &> /dev/null
 #cat <<EOF >./original/sd/boot.scr
 #EOF
 
+echo "[Making ubifs image...]"
+mkdir -p ./tmp
+mkfs.ubifs -r $FILESYS_DM8127 -o ./tmp/ubifs.img -m 2048 -e 126976 -c 827
+ubinize -o $DM38x_ROOTFS -m 2048 -p 128KiB -s 512 -O 2048 ./ubinize.cfg
+rm -rf ./tmp
+
 echo "[Copying files...]"
 
 mount ${DRIVE}1 /mnt
